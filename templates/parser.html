@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Parser</title>
+    <title>parser Page</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <h1>spacy parser</h1>
+    <div id='vanish'>
+      <label for="rtext">text:</label>
+      <div class="form-floating">
+        <textarea id="rtext" name="parse" rows="10" cols="100%"></textarea>
+      </div>
+      <br />
+      <p>
+        <label for="view1">Files:</label>
+        <input type="file" id="myFile" name="filename" accept=".txt, .pdf" />
+        <button id="removeFile" style="display: none">Remove</button>
+      </p>
+      <br />
+      <button class="btn btn-outline-success my-3" onclick="sendtoapi()">
+        Show Results
+      </button>
+    </div>
+      <ul id="ents" class="list-group"></ul>
+
+      <script>
+        const fileInput = document.getElementById("myFile");
+        const removeButton = document.getElementById("removeFile");
+        fileInput.addEventListener("change", () => {
+          if (fileInput.files.length > 0) {
+            removeButton.style.display = "block";
+          } else {
+            removeButton.style.display = "none";
+          }
+        });
+        removeButton.addEventListener("click", () => {
+          fileInput.value = "";
+          removeButton.style.display = "none";
+        });
+
+        var url = "/resumeparser";
+        function display(res) {
+          var ents = document.querySelector("#ents");
+                    // Assuming 'res' is your array of objects
+          let groupedResults = {};
+
+          for (let i = 0; i < res.length; i++) {
+              const label = res[i]["label"];
+              const value = res[i]["value"];
+
+              // Create a list for each label if it doesn't exist
+              if (!groupedResults[label]) {
+                  groupedResults[label] = [];
+              }
+
+              // Add the value to the corresponding label's list
+              groupedResults[label].push(value);
+          }
+
+          // Build the HTML string with grouped values
+          let htmlString = "";
+          for (const label in groupedResults) {
+              const values = groupedResults[label].join(', ');
+              htmlString += `<li class="list-group-item"><b>${label}</b> <br> ${values}</li>`;
+          }
+
+          // Assuming 'ents' is an element where you want to append the HTML
+          ents.innerHTML += htmlString;
+          const van=document.querySelector("#vanish");
+          van.style.display='none';
+       
+        }
+        async function sendtoapi() {
+
+          var text = document.querySelector("#rtext").value;
+          var file = fileInput.files[0];
+
+          if (text || file) {
+            var formData = new FormData();
+
+            if (text) {
+              formData.append("text", text);
+            }
+            else{
+              formData.append("text", null);
+            }
+
+            if (file) {
+              formData.append("file", file);
+            }
+            if (file && text){
+              formData.append("text", null);
+              formData.append("file", null);
+            }
+
+            const response = await fetch ("/resumeparser", {
+              method: "POST",
+              body: formData
+          });
+
+          const data = await response.json();
+
+          display(data)
+
+          }
+        }
+        
+      </script>
+    
+  </body>
+</html>

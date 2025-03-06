@@ -1,0 +1,46 @@
+<html>
+<head>
+    <title>Register</title>
+    <script src="/static/alert.js"></script>
+</head>
+<body>
+    <h2>Register</h2>
+    <form method="post" action="/register" id="registration-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+        <label for="repassword">Reenter Password:</label>
+        <input type="password" id="repassword" name="repassword" required><br>
+        <input type="submit" value="Register">
+    </form>
+    <p id="message"></p>
+    <script>
+        document.getElementById("registration-form").addEventListener("submit", async function (event) {
+            event.preventDefault();
+        
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const repassword = document.getElementById("repassword").value;
+        
+        const response = await fetch('/register', {
+            method: 'POST',
+            body: `username=${username}&password=${password}&repassword=${repassword}`,
+
+            headers: {
+
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+        });
+
+        const data = await response.json();
+        document.getElementById("message").textContent = data.message;
+        if (data.message === "Registration successful") {
+            alert("Registration successful. Please log in.");
+            window.location.href ='/login';
+        }
+    });
+    </script>
+
+</body>
+</html>

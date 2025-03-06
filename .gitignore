@@ -1,0 +1,14 @@
+# Ignore Python cache and environment files
+*_pycache*/
+__pycache__/
+
+
+# Ignore VS Code settings folder
+.vscode/
+
+# Ignore models folder
+resume parser models/
+static/
+model-best/
+model-best ad/
+env/
